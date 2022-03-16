@@ -49,7 +49,7 @@ class Platform{
         return x_position_right;
     }
 
-    void displayPosition(){
+    void display_position(){
 
         glBegin2D();/*opens gl for 2d creation*/
 
@@ -125,7 +125,7 @@ class Player{
             return jumping;
         }
 
-        void displayPosition(){
+        void display_position(){
 
                 glBegin2D();/*opens gl for 2d creation*/
 
@@ -202,22 +202,74 @@ class Cursor{
 
     private:
 
-
+    int centre_x;
+    int centre_y;
+    int x_position_left;
+    int x_position_right;
+    int y_position_top;
+    int y_position_bottom;
+    bool moving_left = false;
+    bool moving_right = false;
 
     public:
 
-        Cursor(){
+        Cursor(int x, int y){
 
+            centre_x = x;
+            centre_y = y;
 
+            x_position_left = centre_x-20;
+            x_position_right = centre_x+20;
 
+            y_position_top = y - 5;
+            y_position_bottom = y + 5;
             
         }
 
+        int get_centre_x(){
+            return centre_x;
+        }
 
+        void set_all_x(int new_value){
+            centre_x = new_value;
+            x_position_left = new_value-16;
+            x_position_right = new_value+16;
+        }
 
+        void display_position(){
 
+            glBegin2D();/*opens gl for 2d creation*/
 
+            glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(0, 0, 255));
 
+            glEnd2D();/*ends gl for 2d creation*/
+
+        }
+
+        void movement(){
+            //if cursor is on middle or right option, then can move left
+            if ((moving_left==true) & ((centre_x == 128)|(centre_x == 198))){
+                set_all_x(centre_x-70);
+                moving_left = false;
+            }
+
+            //if cursor is on left or middle option, then can move right
+            if ((moving_right==true) & ((centre_x == 58)|(centre_x == 128))){
+                set_all_x(centre_x+70);
+                moving_right = false;
+            }
+
+        }
+
+        void update_move_left(bool new_value){
+            moving_left = new_value;
+        }
+
+        void update_move_right(bool new_value){
+            moving_right = new_value;
+        }
+
+        
 
 
 };
@@ -250,23 +302,50 @@ void menu(){
 
     videoSetMode(MODE_5_3D);//set video mode 
 
+    consoleDemoInit();
+
     glScreen2D();
 
-    lcdMainOnBottom();
+    lcdMainOnTop();
 
     bool running = true;
 
-    //Cursor cursor(x,y);
+    Cursor cursor(128,144);
 
     while(running){
 
-        //cursor.display_position();
+        cursor.display_position();
 
         scanKeys();
 
         if(keysDown() & KEY_A){
             running = false;
         }
+
+        //check if left key is pressed
+
+        if(keysDown() & KEY_LEFT){
+            cursor.update_move_left(true);
+        }
+
+
+        if(keysUp() & KEY_LEFT){
+            cursor.update_move_left(false);
+        }
+
+        //check if right key is pressed
+
+        if(keysDown() & KEY_RIGHT){
+            cursor.update_move_right(true);
+        }
+
+
+        if(keysUp() & KEY_RIGHT){
+            cursor.update_move_right(false);
+        }
+
+
+        cursor.movement();//tries to move cursor
 
         glFlush(0);
 
@@ -288,9 +367,9 @@ void area1(){
 
     glScreen2D();
 
-    lcdMainOnTop(); //set main screen to top
-
     lcdMainOnBottom(); //set main screen to bottom
+
+    lcdMainOnTop(); //set main screen to top
 
     Platform floor(128,192,256,10);
 
@@ -318,11 +397,11 @@ void area1(){
 
         //display sprites
 
-        floor.displayPosition();
+        floor.display_position();
 
-        player.displayPosition();
+        player.display_position();
 
-        platform1.displayPosition();
+        platform1.display_position();
 
         //checking what keys have been pressed
 
@@ -390,6 +469,10 @@ void area1(){
 
 
 }
+
+
+//area2 method
+void area2(){}
 
 
 
