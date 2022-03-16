@@ -216,23 +216,56 @@ bool detect_collision_platform(Player player, Platform platform){
     return contact;
 }
 
-int main(void) {
+//main menu method
 
-    videoSetMode(MODE_5_3D);//set video mode 
+void menu(){
 
-    consoleDemoInit();//setup sub screen as text output
+    consoleDemoInit();
+
+    bool running = true;
+
+    while(running){
+
+        iprintf("Main Menu");
+
+
+        scanKeys();
+
+        if(keysDown() & KEY_A){
+            running = false;
+        }
+
+        swiWaitForVBlank();//wait for next frame
+
+        consoleClear();//clear bottom screen of text
+
+
+    }
+}
+
+//area 1 method
+
+void area1(){
+
+videoSetMode(MODE_5_3D);//set video mode 
+
+    consoleDemoInit();//setup sub screen as text output main screen
 
     glScreen2D();
 
     lcdMainOnTop(); //set main screen to top
 
+    lcdMainOnTop(); //set main screen to bottom
+
     Platform floor(128,192,256,10);
 
     Platform platform1(30,160,30,10);
 
-    Player player(128,160);
+    Player player(128,172);
+
+    bool running = true;
     
-	while(1) {
+	while(running) {
 
 
         //debug text
@@ -258,7 +291,7 @@ int main(void) {
 
         //checking what keys have been pressed
 
-        if(keysHeld() & KEY_A){
+        if(keysDown() & KEY_A){
             player.update_jump_action();
         }
 
@@ -318,6 +351,20 @@ int main(void) {
         consoleClear();//clear bottom screen of text
 
     }
+
+
+
+}
+
+
+
+//main game loop method
+
+int main(void) {
+
+    menu();
+
+    area1();
 
 	return 0;
 
