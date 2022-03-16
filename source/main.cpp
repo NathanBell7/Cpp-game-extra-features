@@ -198,6 +198,34 @@ class Player{
 };
 
 
+class Cursor{
+
+    private:
+
+
+
+    public:
+
+        Cursor(){
+
+
+
+            
+        }
+
+
+
+
+
+
+
+
+};
+
+
+
+
+
 void Vblank() {
 	frame++;
 }
@@ -220,20 +248,27 @@ bool detect_collision_platform(Player player, Platform platform){
 
 void menu(){
 
-    consoleDemoInit();
+    videoSetMode(MODE_5_3D);//set video mode 
+
+    glScreen2D();
+
+    lcdMainOnBottom();
 
     bool running = true;
 
+    //Cursor cursor(x,y);
+
     while(running){
 
-        iprintf("Main Menu");
-
+        //cursor.display_position();
 
         scanKeys();
 
         if(keysDown() & KEY_A){
             running = false;
         }
+
+        glFlush(0);
 
         swiWaitForVBlank();//wait for next frame
 
@@ -247,7 +282,7 @@ void menu(){
 
 void area1(){
 
-videoSetMode(MODE_5_3D);//set video mode 
+    videoSetMode(MODE_5_3D);//set video mode 
 
     consoleDemoInit();//setup sub screen as text output main screen
 
@@ -255,7 +290,7 @@ videoSetMode(MODE_5_3D);//set video mode
 
     lcdMainOnTop(); //set main screen to top
 
-    lcdMainOnTop(); //set main screen to bottom
+    lcdMainOnBottom(); //set main screen to bottom
 
     Platform floor(128,192,256,10);
 
@@ -362,9 +397,12 @@ videoSetMode(MODE_5_3D);//set video mode
 
 int main(void) {
 
-    menu();
+    while(1){
 
-    area1();
+        menu();
+
+        area1();
+    }
 
 	return 0;
 
