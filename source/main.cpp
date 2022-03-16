@@ -10,6 +10,8 @@ using namespace std;
 
 volatile int frame = 0;
 
+//----------------------------------------platform class----------------------------------------//
+
 class Platform{
 
     private:
@@ -60,6 +62,8 @@ class Platform{
     }
 
 };
+
+//----------------------------------------player class----------------------------------------//
 
 
 class Player{
@@ -197,6 +201,7 @@ class Player{
         }
 };
 
+//----------------------------------------cursor class----------------------------------------//
 
 class Cursor{
 
@@ -232,8 +237,8 @@ class Cursor{
 
         void set_all_x(int new_value){
             centre_x = new_value;
-            x_position_left = new_value-16;
-            x_position_right = new_value+16;
+            x_position_left = new_value-20;
+            x_position_right = new_value+20;
         }
 
         void display_position(){
@@ -268,19 +273,15 @@ class Cursor{
         void update_move_right(bool new_value){
             moving_right = new_value;
         }
-
-        
-
-
 };
-
-
 
 
 
 void Vblank() {
 	frame++;
 }
+
+
 
 bool detect_collision_platform(Player player, Platform platform){
 
@@ -296,9 +297,13 @@ bool detect_collision_platform(Player player, Platform platform){
     return contact;
 }
 
-//main menu method
 
-void menu(){
+
+//----------------------------------------main menu method----------------------------------------//
+
+
+
+int menu(){
 
     videoSetMode(MODE_5_3D);//set video mode 
 
@@ -353,11 +358,32 @@ void menu(){
 
         consoleClear();//clear bottom screen of text
 
-
     }
+
+    int cursor_location = cursor.get_centre_x();
+
+    int choice;
+
+    if (cursor_location == 58){
+        choice = 1;
+    }
+
+    else if (cursor_location == 128){
+        choice = 2;
+    }
+
+    else{
+        choice = 3;
+    }
+
+    return choice;
 }
 
-//area 1 method
+
+
+//----------------------------------------area 1 method----------------------------------------//
+
+
 
 void area1(){
 
@@ -425,6 +451,10 @@ void area1(){
             player.update_move_right_action(false);
         }
 
+        if(keysDown() & KEY_START){
+            running = false;
+        }
+
         player.character_movement();
 
         //collistion detection calling
@@ -471,20 +501,105 @@ void area1(){
 }
 
 
-//area2 method
-void area2(){}
+
+//----------------------------------------area 2 method----------------------------------------//
 
 
 
-//main game loop method
+void area2(){
+
+    videoSetMode(MODE_5_3D);//set video mode 
+
+    consoleDemoInit();//setup sub screen as text output main screen
+
+    glScreen2D();
+
+    lcdMainOnTop(); //set main screen to bottom
+
+    bool running = true;
+
+    while(running){
+
+        iprintf("Area 2");
+
+        scanKeys();
+
+        if(keysDown() & KEY_START){
+            running = false;
+        }
+
+        glFlush(0);
+
+        swiWaitForVBlank();//wait for next frame
+
+        consoleClear();//clear bottom screen of text
+
+    }
+
+}
+
+
+
+//----------------------------------------area 3 method----------------------------------------//
+
+
+
+void area3(){
+
+    videoSetMode(MODE_5_3D);//set video mode 
+
+    consoleDemoInit();//setup sub screen as text output main screen
+
+    glScreen2D();
+
+    lcdMainOnTop(); //set main screen to bottom
+
+    bool running = true;
+
+    while(running){
+
+        iprintf("Area 3");
+
+        scanKeys();
+
+        if(keysDown() & KEY_START){
+            running = false;
+        }
+
+        glFlush(0);
+
+        swiWaitForVBlank();//wait for next frame
+
+        consoleClear();//clear bottom screen of text
+
+    }
+
+}
+
+
+
+//----------------------------------------main game loop method----------------------------------------//
+
+
 
 int main(void) {
 
     while(1){
 
-        menu();
+        int cursor_location = menu();
 
-        area1();
+        if (cursor_location == 1){
+            area1();
+        }
+
+        else if (cursor_location == 2){
+            area2();
+        }
+
+        else if (cursor_location == 3){
+            area3();
+        }
+
     }
 
 	return 0;
