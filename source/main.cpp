@@ -31,6 +31,7 @@ class Player{
         int y_position_top;
         int y_position_bottom;
         bool on_platform = true;
+        char direction_facing = 'r';
 
 
     public:
@@ -138,12 +139,21 @@ class Player{
         }
 
         void update_move_right_action(bool new_value){
-            moving_right = new_value;
+
+            if(moving_left==false){
+                moving_right = new_value;
+                direction_facing = 'r';
+            }    
+            
             
         }
 
         void update_move_left_action(bool new_value){
-            moving_left = new_value;
+
+            if(moving_right==false){
+                moving_left = new_value;
+                direction_facing = 'l';
+            }
             
         }
 };
@@ -386,7 +396,7 @@ int menu(){
 
     bool running = true;
 
-    Cursor cursor(128,144);
+    Cursor cursor(58,144);
 
     while(running){
 
@@ -472,6 +482,10 @@ void area1(){
 
     Platform platform1(30,160,30,10);
 
+    Platform platform2(226,160,30,10);
+
+    Platform platform3(128,100,30,10);
+
     Player player(128,172);
 
     Wall left_wall(-6,96,10,192);
@@ -504,6 +518,10 @@ void area1(){
 
         platform1.display_position();
 
+        platform2.display_position();
+
+        platform3.display_position();
+
         left_wall.display_position();
 
         right_wall.display_position();
@@ -514,7 +532,7 @@ void area1(){
             player.update_jump_action();
         }
 
-        if(keysDown() & KEY_LEFT){
+        if(keysHeld() & KEY_LEFT){
             player.update_move_left_action(true);
         }
 
@@ -522,7 +540,7 @@ void area1(){
             player.update_move_left_action(false);
         }
 
-        if(keysDown() & KEY_RIGHT){
+        if(keysHeld() & KEY_RIGHT){
             player.update_move_right_action(true);
         }
 
@@ -557,13 +575,32 @@ void area1(){
             }
         }
 
+        if (platform2.detect_collision_player(player) == true){
+            if(player.get_jumping() == false){
+                player.set_falling(false);
+                player.set_all_y(platform2.get_y_position_top()-15);
+                
+            }
+        }
+
+        if (platform3.detect_collision_player(player) == true){
+            if(player.get_jumping() == false){
+                player.set_falling(false);
+                player.set_all_y(platform3.get_y_position_top()-15);
+                
+            }
+        }
+
         //if not on platform
 
         //if player's bottom is not inside platform and player is not jumping, set falling to true
-        if ((floor.detect_collision_player(player) == false)&(platform1.detect_collision_player(player) == false)){
-            if(player.get_jumping() == false){
-                player.set_falling(true);
-            }
+        if ((floor.detect_collision_player(player) == false)
+            &(platform1.detect_collision_player(player) == false)
+            &(platform2.detect_collision_player(player) == false)
+            &(platform3.detect_collision_player(player) == false)){
+                if(player.get_jumping() == false){
+                    player.set_falling(true);
+                }
         }
 
         //collision detection for walls
