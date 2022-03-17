@@ -10,59 +10,6 @@ using namespace std;
 
 volatile int frame = 0;
 
-//----------------------------------------platform class----------------------------------------//
-
-class Platform{
-
-    private:
-
-        int x_position_centre;
-        int y_position_centre;
-        int x_position_left;
-        int x_position_right;
-        int y_position_top;
-        int y_position_bottom;
-
-    public:
-
-    Platform(int x_centre, int y_centre, int width, int height){
-        x_position_centre = x_centre;
-        x_position_left = x_position_centre-(width/2);
-        x_position_right = x_position_centre+(width/2);
-
-        y_position_centre = y_centre;
-        y_position_top = y_position_centre-(height/2);
-        y_position_bottom = y_position_centre+(height/2);
-    }
-
-    int get_y_position_top(){
-        return y_position_top;
-    }
-
-    int get_y_position_bottom(){
-        return y_position_bottom;
-    }
-
-    int get_x_position_left(){
-        return x_position_left;
-    }
-
-    int get_x_position_right(){
-        return x_position_right;
-    }
-
-    void display_position(){
-
-        glBegin2D();/*opens gl for 2d creation*/
-
-        glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(255, 0, 0));
-
-        glEnd2D();/*ends gl for 2d creation*/
-
-    }
-
-};
-
 //----------------------------------------player class----------------------------------------//
 
 
@@ -201,6 +148,75 @@ class Player{
         }
 };
 
+//----------------------------------------platform class----------------------------------------//
+
+class Platform{
+
+    private:
+
+        int x_position_centre;
+        int y_position_centre;
+        int x_position_left;
+        int x_position_right;
+        int y_position_top;
+        int y_position_bottom;
+
+    public:
+
+    Platform(int x_centre, int y_centre, int width, int height){
+        x_position_centre = x_centre;
+        x_position_left = x_position_centre-(width/2);
+        x_position_right = x_position_centre+(width/2);
+
+        y_position_centre = y_centre;
+        y_position_top = y_position_centre-(height/2);
+        y_position_bottom = y_position_centre+(height/2);
+    }
+
+    bool detect_collision_platform(Player player){
+
+    bool contact = false;
+    // if player's bottom is inside platform
+    if ((player.get_x_position_left()<x_position_right)
+        &(player.get_x_position_right()>x_position_left)
+        &(player.get_y_position_bottom()>y_position_top)
+        &(player.get_y_position_bottom()<y_position_bottom)){
+            contact = true;
+        }
+    
+    return contact;
+}
+
+    int get_y_position_top(){
+        return y_position_top;
+    }
+
+    int get_y_position_bottom(){
+        return y_position_bottom;
+    }
+
+    int get_x_position_left(){
+        return x_position_left;
+    }
+
+    int get_x_position_right(){
+        return x_position_right;
+    }
+
+    void display_position(){
+
+        glBegin2D();/*opens gl for 2d creation*/
+
+        glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(255, 0, 0));
+
+        glEnd2D();/*ends gl for 2d creation*/
+
+    }
+
+};
+
+
+
 //----------------------------------------cursor class----------------------------------------//
 
 class Cursor{
@@ -327,19 +343,7 @@ void Vblank() {
 
 
 
-bool detect_collision_platform(Player player, Platform platform){
 
-    bool contact = false;
-    // if player's bottom is inside platform
-    if ((player.get_x_position_left()<platform.get_x_position_right())
-        &(player.get_x_position_right()>platform.get_x_position_left())
-        &(player.get_y_position_bottom()>platform.get_y_position_top())
-        &(player.get_y_position_bottom()<platform.get_y_position_bottom())){
-            contact = true;
-        }
-    
-    return contact;
-}
 
 
 
@@ -506,7 +510,7 @@ void area1(){
         //if on platform
 
         //if player's bottom is inside platform and if not jumping, set falling to false
-        if (detect_collision_platform(player,floor) == true){
+        if (floor.detect_collision_platform(player) == true){
             if(player.get_jumping() == false){
                 player.set_falling(false);
                 player.set_all_y(floor.get_y_position_top()-15);
@@ -514,7 +518,7 @@ void area1(){
             }
         }
 
-        if (detect_collision_platform(player,platform1) == true){
+        if (platform1.detect_collision_platform(player) == true){
             if(player.get_jumping() == false){
                 player.set_falling(false);
                 player.set_all_y(platform1.get_y_position_top()-15);
@@ -525,7 +529,7 @@ void area1(){
         //if not on platform
 
         //if player's bottom is not inside platform and player is not jumping, set falling to true
-        if ((detect_collision_platform(player,floor) == false)&(detect_collision_platform(player,platform1) == false)){
+        if ((floor.detect_collision_platform(player) == false)&(platform1.detect_collision_platform(player) == false)){
             if(player.get_jumping() == false){
                 player.set_falling(true);
             }
