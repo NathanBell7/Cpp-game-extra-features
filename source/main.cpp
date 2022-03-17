@@ -173,19 +173,18 @@ class Platform{
         y_position_bottom = y_position_centre+(height/2);
     }
 
-    bool detect_collision_platform(Player player){
-
-    bool contact = false;
-    // if player's bottom is inside platform
-    if ((player.get_x_position_left()<x_position_right)
-        &(player.get_x_position_right()>x_position_left)
-        &(player.get_y_position_bottom()>y_position_top)
-        &(player.get_y_position_bottom()<y_position_bottom)){
-            contact = true;
-        }
-    
-    return contact;
-}
+    bool detect_collision_player(Player player){
+        bool contact = false;
+        // if player's bottom is inside platform
+        if ((player.get_x_position_left()<x_position_right)
+            &(player.get_x_position_right()>x_position_left)
+            &(player.get_y_position_bottom()>y_position_top)
+            &(player.get_y_position_bottom()<y_position_bottom)){
+                contact = true;
+            }
+        
+        return contact;
+    }
 
     int get_y_position_top(){
         return y_position_top;
@@ -309,7 +308,7 @@ private:
 
 public:
 
-    Wall(int x, int y,int height,int width){
+    Wall(int x, int y, int width, int height){
 
         centre_x = x;
         centre_y = y;
@@ -320,6 +319,24 @@ public:
 
 
     }
+
+
+    int get_y_position_top(){
+        return y_position_top;
+    }
+
+    int get_y_position_bottom(){
+        return y_position_bottom;
+    }
+
+    int get_x_position_left(){
+        return x_position_left;
+    }
+
+    int get_x_position_right(){
+        return x_position_right;
+    }
+
 
     void display_position(){
 
@@ -332,6 +349,16 @@ public:
     }
 
 
+    bool detect_collision_player(Player player){
+        bool contact = false;
+        // if player's bottom is inside platform
+        if ((player.get_x_position_left()<x_position_right)
+            &(player.get_x_position_right()>x_position_left)){
+                contact = true;
+            }
+        
+        return contact;
+    }
 
 };
 
@@ -340,10 +367,6 @@ public:
 void Vblank() {
 	frame++;
 }
-
-
-
-
 
 
 
@@ -451,6 +474,10 @@ void area1(){
 
     Player player(128,172);
 
+    Wall left_wall(-6,96,10,192);
+
+    Wall right_wall(262,96,10,192);
+
     bool running = true;
     
 	while(running) {
@@ -476,6 +503,10 @@ void area1(){
         player.display_position();
 
         platform1.display_position();
+
+        left_wall.display_position();
+
+        right_wall.display_position();
 
         //checking what keys have been pressed
 
@@ -505,12 +536,12 @@ void area1(){
 
         player.character_movement();
 
-        //collistion detection calling
+        //collision detection for platforms
 
         //if on platform
 
         //if player's bottom is inside platform and if not jumping, set falling to false
-        if (floor.detect_collision_platform(player) == true){
+        if (floor.detect_collision_player(player) == true){
             if(player.get_jumping() == false){
                 player.set_falling(false);
                 player.set_all_y(floor.get_y_position_top()-15);
@@ -518,7 +549,7 @@ void area1(){
             }
         }
 
-        if (platform1.detect_collision_platform(player) == true){
+        if (platform1.detect_collision_player(player) == true){
             if(player.get_jumping() == false){
                 player.set_falling(false);
                 player.set_all_y(platform1.get_y_position_top()-15);
@@ -529,10 +560,20 @@ void area1(){
         //if not on platform
 
         //if player's bottom is not inside platform and player is not jumping, set falling to true
-        if ((floor.detect_collision_platform(player) == false)&(platform1.detect_collision_platform(player) == false)){
+        if ((floor.detect_collision_player(player) == false)&(platform1.detect_collision_player(player) == false)){
             if(player.get_jumping() == false){
                 player.set_falling(true);
             }
+        }
+
+        //collision detection for walls
+
+        if(left_wall.detect_collision_player(player)==true){
+            player.set_all_x(left_wall.get_x_position_right()+17);
+        }
+
+        if(right_wall.detect_collision_player(player)==true){
+            player.set_all_x(right_wall.get_x_position_left()-17);
         }
 
 
@@ -543,8 +584,6 @@ void area1(){
         consoleClear();//clear bottom screen of text
 
     }
-
-
 
 }
 
