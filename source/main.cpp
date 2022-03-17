@@ -31,20 +31,22 @@ class Player{
         int y_position_top;
         int y_position_bottom;
         bool on_platform = true;
-        char direction_facing = 'r';
+        char direction_facing ;
 
 
     public:
 
-        Player(int x, int y){
+        Player(int x, int y, char facing){
 
-            x_position_centre = x;
-            x_position_left = x_position_centre-16;
-            x_position_right = x_position_centre+16;
+            this->x_position_centre = x;
+            this->x_position_left = x_position_centre-16;
+            this->x_position_right = x_position_centre+16;
 
-            y_position_centre = y;
-            y_position_top = y_position_centre-16;
-            y_position_bottom = y_position_centre+16;
+            this->y_position_centre = y;
+            this->y_position_top = y_position_centre-16;
+            this->y_position_bottom = y_position_centre+16;
+
+            this->direction_facing = facing;
 
 
         }
@@ -71,6 +73,14 @@ class Player{
 
         int get_x_position_right(){
             return x_position_right;
+        }
+
+        int get_centre_x(){
+            return x_position_centre;
+        }
+
+        int get_centre_y(){
+            return y_position_centre;
         }
 
         bool get_jumping(){
@@ -156,6 +166,87 @@ class Player{
             }
             
         }
+
+};
+
+//----------------------------------------ranged weapon class----------------------------------------//
+
+class RangedWeapon{
+
+    private:
+
+        //times are frame based
+
+        int projectile_speed;
+        int damage;
+        int projectile_delay;
+        int reload_time;
+        int time_until_next_projectile = 0;
+        bool reloading = false;
+        int projectile_capacity;
+        int x_position;
+        int y_position;
+        int current_projectile_amount;
+        char direction_facing;
+
+
+    public:
+
+        RangedWeapon(int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position){
+
+            this->projectile_speed = projectile_speed;
+            this->damage = damage;
+            this->projectile_delay = projectile_delay;
+            this->reload_time = reload_time;
+            this->direction_facing = direction_facing;
+            this->projectile_capacity = projectile_capacity;
+            this->current_projectile_amount = projectile_capacity;
+
+            this->x_position = x_position;
+            this->y_position = y_position;
+
+        }
+
+
+        void move_weapon(int new_x, int new_y){
+
+            x_position = new_x;
+            y_position = new_y;
+
+        }
+
+        bool shoot_projectile(){
+
+            bool shooting = false;
+
+            if ((time_until_next_projectile == 0)&(current_projectile_amount > 0)&(reloading == false)){
+                //Projectile projectile(int x_position, int y_position, int damage, int projectile_speed, char direction_facing);
+                time_until_next_projectile = projectile_delay;
+                current_projectile_amount -= 1;
+                shooting = true;
+            }
+
+            return shooting;
+
+        }
+
+        int get_time_until_next_projectile(){
+            return time_until_next_projectile;
+        }
+
+        void update_time_until_next_projectile(int new_time){
+            time_until_next_projectile = new_time;
+        }
+
+        int get_current_projectile_amount(){
+            return current_projectile_amount;
+        }
+
+        void reload(/*bool new_value*/){
+            //reloading = new_value;
+            current_projectile_amount = projectile_capacity;
+        }
+
 };
 
 //----------------------------------------platform class----------------------------------------//
@@ -174,13 +265,13 @@ class Platform{
     public:
 
     Platform(int x_centre, int y_centre, int width, int height){
-        x_position_centre = x_centre;
-        x_position_left = x_position_centre-(width/2);
-        x_position_right = x_position_centre+(width/2);
+        this->x_position_centre = x_centre;
+        this->x_position_left = x_position_centre-(width/2);
+        this->x_position_right = x_position_centre+(width/2);
 
-        y_position_centre = y_centre;
-        y_position_top = y_position_centre-(height/2);
-        y_position_bottom = y_position_centre+(height/2);
+        this->y_position_centre = y_centre;
+        this->y_position_top = y_position_centre-(height/2);
+        this->y_position_bottom = y_position_centre+(height/2);
     }
 
     bool detect_collision_player(Player player){
@@ -225,8 +316,8 @@ class Platform{
 };
 
 
-
 //----------------------------------------cursor class----------------------------------------//
+
 
 class Cursor{
 
@@ -245,14 +336,14 @@ class Cursor{
 
         Cursor(int x, int y){
 
-            centre_x = x;
-            centre_y = y;
+            this->centre_x = x;
+            this->centre_y = y;
 
-            x_position_left = centre_x-20;
-            x_position_right = centre_x+20;
+            this->x_position_left = centre_x-20;
+            this->x_position_right = centre_x+20;
 
-            y_position_top = y - 5;
-            y_position_bottom = y + 5;
+            this->y_position_top = y - 5;
+            this->y_position_bottom = y + 5;
             
         }
 
@@ -320,12 +411,12 @@ public:
 
     Wall(int x, int y, int width, int height){
 
-        centre_x = x;
-        centre_y = y;
-        x_position_left = centre_x - (width/2);
-        x_position_right = centre_x + (width/2);
-        y_position_top = centre_y - (height/2);
-        y_position_bottom = centre_y + (height/2);
+        this->centre_x = x;
+        this->centre_y = y;
+        this->x_position_left = centre_x - (width/2);
+        this->x_position_right = centre_x + (width/2);
+        this->y_position_top = centre_y - (height/2);
+        this->y_position_bottom = centre_y + (height/2);
 
 
     }
@@ -478,6 +569,8 @@ void area1(){
 
     lcdMainOnTop(); //set main screen to top
 
+
+
     Platform floor(128,192,256,10);
 
     Platform platform1(30,160,30,10);
@@ -486,11 +579,25 @@ void area1(){
 
     Platform platform3(128,100,30,10);
 
-    Player player(128,172);
+
+    char starting_direction = 'r';
+
+    int starting_x = 128;
+
+    int starting_y = 172;
+
+    bool tracking_weapon_delay = false;
+
+    Player player(starting_x,starting_y,starting_direction);
 
     Wall left_wall(-6,96,10,192);
 
     Wall right_wall(262,96,10,192);
+
+
+    //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
+
+    RangedWeapon weapon(3,3,100,300,'r',12,starting_x,starting_y);
 
     bool running = true;
     
@@ -498,14 +605,18 @@ void area1(){
 
 
         //debug text
-        iprintf("%i",player.get_y_position_bottom());
+        iprintf("bottom of player model %i",player.get_y_position_bottom());
         iprintf("\n");
-        iprintf("%i",floor.get_y_position_bottom());
-        iprintf("\n");
-        iprintf("%i",player.get_x_position_left());
+        iprintf("left of player model %i",player.get_x_position_left());
         
         iprintf("\n");
-        iprintf("%i",player.get_falling());
+        iprintf("if player is falling %i",player.get_falling());
+        
+        iprintf("\n");
+        iprintf("number of projectiles %i",weapon.get_current_projectile_amount());
+
+        iprintf("\n");
+        iprintf("time until next projectile %i",weapon.get_time_until_next_projectile());
         
 
         scanKeys();
@@ -532,6 +643,14 @@ void area1(){
             player.update_jump_action();
         }
 
+        if(keysDown() & KEY_B){
+            bool shooting = weapon.shoot_projectile();
+            if (shooting){
+                tracking_weapon_delay = true;
+            }
+            
+        }
+
         if(keysHeld() & KEY_LEFT){
             player.update_move_left_action(true);
         }
@@ -552,7 +671,21 @@ void area1(){
             running = false;
         }
 
+        weapon.move_weapon(player.get_centre_x(),player.get_centre_y());
         player.character_movement();
+
+        //checking if player can shoot another bullet via delay
+
+        if(tracking_weapon_delay == true){
+            weapon.update_time_until_next_projectile(weapon.get_time_until_next_projectile()-1);
+            if (weapon.get_time_until_next_projectile()==0){
+                tracking_weapon_delay = false;
+            }
+        }
+
+        if(weapon.get_current_projectile_amount() == 0){
+            weapon.reload();
+        }
 
         //collision detection for platforms
 
