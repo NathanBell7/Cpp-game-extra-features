@@ -131,11 +131,11 @@ class Player{
 
         void display_position(){
 
-                glBegin2D();/*opens gl for 2d creation*/
+            glBegin2D();/*opens gl for 2d creation*/
 
-                glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(255, 255, 0));
+            glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(255, 255, 0));
 
-                glEnd2D();/*ends gl for 2d creation*/
+            glEnd2D();/*ends gl for 2d creation*/
 
         }
 
@@ -273,6 +273,50 @@ class Cursor{
         void update_move_right(bool new_value){
             moving_right = new_value;
         }
+};
+
+//----------------------------------------wall class----------------------------------------//
+
+class Wall{
+
+private:
+
+    int centre_x;
+    int centre_y;
+    int x_position_left;
+    int x_position_right;
+    int y_position_top;
+    int y_position_bottom;
+
+
+
+
+public:
+
+    Wall(int x, int y,int height,int width){
+
+        centre_x = x;
+        centre_y = y;
+        x_position_left = centre_x - (width/2);
+        x_position_right = centre_x + (width/2);
+        y_position_top = centre_y - (height/2);
+        y_position_bottom = centre_y + (height/2);
+
+
+    }
+
+    void display_position(){
+
+        glBegin2D();/*opens gl for 2d creation*/
+
+        glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(0, 0, 255));
+
+        glEnd2D();/*ends gl for 2d creation*/
+
+    }
+
+
+
 };
 
 
