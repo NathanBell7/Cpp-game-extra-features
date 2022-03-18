@@ -169,7 +169,7 @@ class Player{
 
 };
 
-//----------------------------------------ranged weapon class----------------------------------------//
+//----------------------------------------ranged pistol class----------------------------------------//
 
 class RangedWeapon{
 
@@ -597,7 +597,7 @@ void area1(){
 
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    RangedWeapon weapon(3,3,100,300,'r',12,starting_x,starting_y);
+    RangedWeapon pistol(3,3,100,300,'r',12,starting_x,starting_y);
 
     bool running = true;
     
@@ -613,10 +613,10 @@ void area1(){
         iprintf("if player is falling %i",player.get_falling());
         
         iprintf("\n");
-        iprintf("number of projectiles %i",weapon.get_current_projectile_amount());
+        iprintf("number of projectiles %i",pistol.get_current_projectile_amount());
 
         iprintf("\n");
-        iprintf("time until next projectile %i",weapon.get_time_until_next_projectile());
+        iprintf("time until next projectile %i",pistol.get_time_until_next_projectile());
         
 
         scanKeys();
@@ -644,7 +644,7 @@ void area1(){
         }
 
         if(keysDown() & KEY_B){
-            bool shooting = weapon.shoot_projectile();
+            bool shooting = pistol.shoot_projectile();
             if (shooting){
                 tracking_weapon_delay = true;
             }
@@ -671,20 +671,22 @@ void area1(){
             running = false;
         }
 
-        weapon.move_weapon(player.get_centre_x(),player.get_centre_y());
+        pistol.move_weapon(player.get_centre_x(),player.get_centre_y());
         player.character_movement();
 
         //checking if player can shoot another bullet via delay
 
         if(tracking_weapon_delay == true){
-            weapon.update_time_until_next_projectile(weapon.get_time_until_next_projectile()-1);
-            if (weapon.get_time_until_next_projectile()==0){
+            pistol.update_time_until_next_projectile(pistol.get_time_until_next_projectile()-1);
+            if (pistol.get_time_until_next_projectile()==0){
                 tracking_weapon_delay = false;
             }
         }
 
-        if(weapon.get_current_projectile_amount() == 0){
-            weapon.reload();
+        //check to see if need to auto reload due to empty magazine
+
+        if(pistol.get_current_projectile_amount() == 0){
+            pistol.reload();
         }
 
         //collision detection for platforms
