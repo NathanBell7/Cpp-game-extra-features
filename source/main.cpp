@@ -296,13 +296,17 @@ class Weapon{
 
         void move_weapon(int new_x, int new_y){
 
+            if (new_x != x_position){
+
+                if(new_x > x_position){
+                    direction_facing = 'r';
+                }
+                
+                else{
+                    direction_facing = 'l';
+                }
+            }
             
-            if(new_x > x_position){
-                direction_facing = 'r';
-            }
-            else{
-                direction_facing = 'l';
-            }
 
             x_position = new_x;
             
@@ -689,7 +693,6 @@ void area1(){
     lcdMainOnBottom(); //set main screen to bottom
 
     lcdMainOnTop(); //set main screen to top
-
 
 
     Platform floor(128,202,256,20);
