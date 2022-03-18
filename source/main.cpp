@@ -327,7 +327,7 @@ class Weapon{
 
         Projectile* create_projectile(){
 
-            Projectile *new_projectile = new Projectile(projectile_speed,direction_facing, x_position,y_position,6,3,damage);
+            Projectile *new_projectile = new Projectile(projectile_speed,direction_facing, x_position,y_position,10,5,damage);
 
             return new_projectile;
 
@@ -713,14 +713,14 @@ void area1(){
 
     Player player(starting_x,starting_y,starting_direction);
 
-    Wall left_wall(-6,96,10,192);
+    Wall left_wall(-7,96,10,192);
 
     Wall right_wall(262,96,10,192);
 
 
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    Weapon weapon(3,3,10,300,'r',12,starting_x,starting_y,"ranged");
+    Weapon weapon(10,3,10,300,'r',12,starting_x,starting_y,"ranged");
 
     std::list<Projectile*> list_of_projectiles;
 
