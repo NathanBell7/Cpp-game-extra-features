@@ -6,6 +6,8 @@
 
 #include<string>
 
+#include <list>
+
 using namespace std;
 
 //256x192 pixels
@@ -171,6 +173,84 @@ class Player{
 
 };
 
+
+
+//----------------------------------------projectile class----------------------------------------//
+
+
+class Projectile{
+
+    private:
+
+    int projectile_speed;
+    char direction_facing;
+    int x_position;
+    int x_position_left;
+    int x_position_right;
+    int y_position;
+    int y_position_top;
+    int y_position_bottom;
+    int damage;
+    int width;
+    int height;
+
+    public:
+
+    Projectile(int projectile_speed, char direction_facing, int x_position, int y_position, int width, int height, int damage){
+
+        if(direction_facing == 'r'){
+            this->projectile_speed = projectile_speed;
+        }
+        else{
+            this->projectile_speed = -(projectile_speed);
+        }
+        
+        this->direction_facing = direction_facing;
+        this->x_position = x_position;
+        this->x_position_left = x_position - (width/2);
+        this->x_position_right = x_position + (width/2);
+
+        this->y_position = y_position;
+        this->y_position_top = y_position - (height/2);
+        this->y_position_bottom = y_position + (height/2);
+
+        this->damage = damage;
+
+    }
+
+
+    void display_projectile(){
+
+        glBegin2D();/*opens gl for 2d creation*/
+
+        glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(255, 255, 0));
+
+        glEnd2D();/*ends gl for 2d creation*/
+
+
+    }
+
+
+    void update_position(){
+
+        x_position += projectile_speed;
+        x_position_left = x_position - (width/2);
+        x_position_right = x_position + (width/2);
+
+        if ((x_position > 256)|(x_position < 0)){
+            //delete this;   delete object if off screen
+        } 
+
+    }
+
+    int get_centre_x(){
+        return x_position;
+    }
+
+
+};
+
+
 //----------------------------------------ranged weapon class----------------------------------------//
 
 class Weapon{
@@ -216,7 +296,16 @@ class Weapon{
 
         void move_weapon(int new_x, int new_y){
 
+            
+            if(new_x > x_position){
+                direction_facing = 'r';
+            }
+            else{
+                direction_facing = 'l';
+            }
+
             x_position = new_x;
+            
             y_position = new_y;
 
         }
@@ -233,6 +322,15 @@ class Weapon{
             }
 
             return shooting;
+
+        }
+
+        Projectile* create_projectile(){
+
+            Projectile *new_projectile = new Projectile(projectile_speed,direction_facing, x_position,y_position,6,3,damage);
+
+            return new_projectile;
+
 
         }
 
@@ -265,7 +363,7 @@ class Weapon{
             time_until_reloaded = reload_time;
         }
 
-        void refill_magazine(){
+        void reload_magazine(){
             current_projectile_amount = projectile_capacity;
             reloading = false;
         }
@@ -594,7 +692,7 @@ void area1(){
 
 
 
-    Platform floor(128,192,256,10);
+    Platform floor(128,202,256,20);
 
     Platform platform1(30,160,30,10);
 
@@ -607,7 +705,7 @@ void area1(){
 
     int starting_x = 128;
 
-    int starting_y = 172;
+    int starting_y = 180;
 
     bool tracking_weapon_delay = false;
 
@@ -623,6 +721,8 @@ void area1(){
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
     Weapon weapon(3,3,10,300,'r',12,starting_x,starting_y,"ranged");
+
+    std::list<Projectile*> list_of_projectiles;
 
     bool running = true;
     
@@ -648,6 +748,9 @@ void area1(){
 
         iprintf("\n");
         iprintf("reloading %i",weapon.get_reloading());
+
+        iprintf("\n");
+        iprintf("number of projectiles %i",list_of_projectiles.size());
         
 
         scanKeys();
@@ -668,6 +771,13 @@ void area1(){
 
         right_wall.display_position();
 
+        for(Projectile* projectile : list_of_projectiles){
+            projectile->display_projectile();
+            projectile->update_position();
+            iprintf("\n");
+            iprintf("proj x %i",projectile->get_centre_x());
+        }
+
         //checking what keys have been pressed
 
         if(keysDown() & KEY_A){
@@ -677,6 +787,8 @@ void area1(){
         if(keysDown() & KEY_B){
             bool shooting = weapon.shoot_projectile();
             if (shooting){
+                Projectile *new_projectile = weapon.create_projectile();
+                list_of_projectiles.insert(list_of_projectiles.begin(), new_projectile);
                 tracking_weapon_delay = true;
             }
             
@@ -723,7 +835,7 @@ void area1(){
                 tracking_reload = true;
             }
         }
-        
+
 
         //checking if tracking reload and if the reload is complete whilst udating reload timer
 
@@ -731,7 +843,7 @@ void area1(){
             weapon.update_time_until_reloaded(weapon.get_time_until_reloaded()-1);
             if(weapon.get_time_until_reloaded() == 0){
                 tracking_reload = false;
-                weapon.refill_magazine();
+                weapon.reload_magazine();
             }
         }
 
