@@ -4,6 +4,8 @@
 
 #include<gl2d.h>
 
+#include<string>
+
 using namespace std;
 
 //256x192 pixels
@@ -169,9 +171,9 @@ class Player{
 
 };
 
-//----------------------------------------ranged pistol class----------------------------------------//
+//----------------------------------------ranged weapon class----------------------------------------//
 
-class RangedWeapon{
+class Weapon{
 
     private:
 
@@ -187,12 +189,14 @@ class RangedWeapon{
         int x_position;
         int y_position;
         int current_projectile_amount;
+        string weapon_type;
         char direction_facing;
+        int time_until_reloaded;
 
 
     public:
 
-        RangedWeapon(int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position){
+        Weapon(int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position, string weapon_type){
 
             this->projectile_speed = projectile_speed;
             this->damage = damage;
@@ -204,6 +208,8 @@ class RangedWeapon{
 
             this->x_position = x_position;
             this->y_position = y_position;
+
+            this->weapon_type = weapon_type;
 
         }
 
@@ -238,13 +244,30 @@ class RangedWeapon{
             time_until_next_projectile = new_time;
         }
 
+        int get_time_until_reloaded(){
+            return time_until_reloaded;
+        }
+
+        void update_time_until_reloaded(int new_time){
+            time_until_reloaded = new_time;
+        }
+
         int get_current_projectile_amount(){
             return current_projectile_amount;
         }
 
-        void reload(/*bool new_value*/){
-            //reloading = new_value;
+        bool get_reloading(){
+            return reloading;
+        }
+
+        void start_reload_timer(){
+            reloading = true;
+            time_until_reloaded = reload_time;
+        }
+
+        void refill_magazine(){
             current_projectile_amount = projectile_capacity;
+            reloading = false;
         }
 
 };
@@ -588,6 +611,8 @@ void area1(){
 
     bool tracking_weapon_delay = false;
 
+    bool tracking_reload = false;
+
     Player player(starting_x,starting_y,starting_direction);
 
     Wall left_wall(-6,96,10,192);
@@ -597,7 +622,7 @@ void area1(){
 
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    RangedWeapon pistol(3,3,100,300,'r',12,starting_x,starting_y);
+    Weapon weapon(3,3,10,300,'r',12,starting_x,starting_y,"ranged");
 
     bool running = true;
     
@@ -613,10 +638,16 @@ void area1(){
         iprintf("if player is falling %i",player.get_falling());
         
         iprintf("\n");
-        iprintf("number of projectiles %i",pistol.get_current_projectile_amount());
+        iprintf("number of projectiles %i",weapon.get_current_projectile_amount());
 
         iprintf("\n");
-        iprintf("time until next projectile %i",pistol.get_time_until_next_projectile());
+        iprintf("time until next projectile %i",weapon.get_time_until_next_projectile());
+
+        iprintf("\n");
+        iprintf("time until reloaded %i",weapon.get_time_until_reloaded());
+
+        iprintf("\n");
+        iprintf("reloading %i",weapon.get_reloading());
         
 
         scanKeys();
@@ -644,7 +675,7 @@ void area1(){
         }
 
         if(keysDown() & KEY_B){
-            bool shooting = pistol.shoot_projectile();
+            bool shooting = weapon.shoot_projectile();
             if (shooting){
                 tracking_weapon_delay = true;
             }
@@ -671,23 +702,40 @@ void area1(){
             running = false;
         }
 
-        pistol.move_weapon(player.get_centre_x(),player.get_centre_y());
+        weapon.move_weapon(player.get_centre_x(),player.get_centre_y());
         player.character_movement();
 
         //checking if player can shoot another bullet via delay
 
         if(tracking_weapon_delay == true){
-            pistol.update_time_until_next_projectile(pistol.get_time_until_next_projectile()-1);
-            if (pistol.get_time_until_next_projectile()==0){
+            weapon.update_time_until_next_projectile(weapon.get_time_until_next_projectile()-1);
+            if (weapon.get_time_until_next_projectile() == 0){
                 tracking_weapon_delay = false;
             }
         }
 
-        //check to see if need to auto reload due to empty magazine
 
-        if(pistol.get_current_projectile_amount() == 0){
-            pistol.reload();
+        //check to see if need to auto start_reload_timer due to empty magazine
+
+        if(weapon.get_current_projectile_amount() == 0){
+            if (tracking_reload == false){
+                weapon.start_reload_timer();
+                tracking_reload = true;
+            }
         }
+        
+
+        //checking if tracking reload and if the reload is complete whilst udating reload timer
+
+        if(tracking_reload == true){
+            weapon.update_time_until_reloaded(weapon.get_time_until_reloaded()-1);
+            if(weapon.get_time_until_reloaded() == 0){
+                tracking_reload = false;
+                weapon.refill_magazine();
+            }
+        }
+
+        
 
         //collision detection for platforms
 
