@@ -781,31 +781,24 @@ void area1(){
 
         right_wall.display_position();
 
-        //update projectile objects
-
-        
-
-        for(Projectile* projectile : list_of_projectiles){
-            projectile->display_projectile();
-            projectile->update_position();
-            iprintf("\n");
-            iprintf("proj x %i",projectile->get_centre_x());
-        }
-
-        
-
+        //update projectile objects via pointer
 
         for(std::list<Projectile*>::iterator it = list_of_projectiles.begin(); it != list_of_projectiles.end();){
+
+            (*it)->display_projectile();//show location
+            (*it)->update_position();//move projectile
+
+            iprintf("\n");
+            iprintf("proj x %i",(*it)->get_centre_x());//print centre
+
+            //if projectile is not on screen, erase from list
             if(((*it)->get_exist())==false){
                 it = list_of_projectiles.erase(it);
             }
 
-            else{
-
+            else{//else increment iterator
                 ++it;
             }
-
-
 
         }
 
@@ -816,8 +809,9 @@ void area1(){
         }
 
         if(keysDown() & KEY_B){
-            bool shooting = weapon.shoot_projectile();
+            bool shooting = weapon.shoot_projectile();//handles delay and returns bool if shooting has occured
             if (shooting){
+                //if weapon is shooting a new projectile, create a new pointer object and add to list of projectiles and track delay until next shot
                 Projectile *new_projectile = weapon.create_projectile();
                 list_of_projectiles.insert(list_of_projectiles.begin(), new_projectile);
                 tracking_weapon_delay = true;
