@@ -193,6 +193,9 @@ class Projectile{
     int damage;
     int width;
     int height;
+    bool exist = true;
+
+
 
     public:
 
@@ -238,13 +241,17 @@ class Projectile{
         x_position_right = x_position + (width/2);
 
         if ((x_position > 256)|(x_position < 0)){
-            //delete this;   delete object if off screen
+            exist = false;
         } 
 
     }
 
     int get_centre_x(){
         return x_position;
+    }
+
+    bool get_exist(){
+        return exist;
     }
 
 
@@ -723,7 +730,7 @@ void area1(){
 
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    Weapon weapon(10,3,10,300,'r',12,starting_x,starting_y,"ranged");
+    Weapon weapon(3,3,10,300,'r',12,starting_x,starting_y,"ranged");
 
     std::list<Projectile*> list_of_projectiles;
 
@@ -774,11 +781,32 @@ void area1(){
 
         right_wall.display_position();
 
+        //update projectile objects
+
+        
+
         for(Projectile* projectile : list_of_projectiles){
             projectile->display_projectile();
             projectile->update_position();
             iprintf("\n");
             iprintf("proj x %i",projectile->get_centre_x());
+        }
+
+        
+
+
+        for(std::list<Projectile*>::iterator it = list_of_projectiles.begin(); it != list_of_projectiles.end();){
+            if(((*it)->get_exist())==false){
+                it = list_of_projectiles.erase(it);
+            }
+
+            else{
+
+                ++it;
+            }
+
+
+
         }
 
         //checking what keys have been pressed
