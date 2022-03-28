@@ -184,10 +184,10 @@ class Projectile{
 
     int projectile_speed;
     char direction_facing;
-    int x_position;
+    int x_position_centre;
     int x_position_left;
     int x_position_right;
-    int y_position;
+    int y_position_centre;
     int y_position_top;
     int y_position_bottom;
     int damage;
@@ -199,7 +199,7 @@ class Projectile{
 
     public:
 
-    Projectile(int projectile_speed, char direction_facing, int x_position, int y_position, int width, int height, int damage){
+    Projectile(int projectile_speed, char direction_facing, int x_position_centre, int y_position_centre, int width, int height, int damage){
 
         if(direction_facing == 'r'){
             this->projectile_speed = projectile_speed;
@@ -209,13 +209,13 @@ class Projectile{
         }
         
         this->direction_facing = direction_facing;
-        this->x_position = x_position;
-        this->x_position_left = x_position - (width/2);
-        this->x_position_right = x_position + (width/2);
+        this->x_position_centre = x_position_centre;
+        this->x_position_left = x_position_centre - (width/2);
+        this->x_position_right = x_position_centre + (width/2);
 
-        this->y_position = y_position;
-        this->y_position_top = y_position - (height/2);
-        this->y_position_bottom = y_position + (height/2);
+        this->y_position_centre = y_position_centre;
+        this->y_position_top = y_position_centre - (height/2);
+        this->y_position_bottom = y_position_centre + (height/2);
 
         this->damage = damage;
 
@@ -236,18 +236,18 @@ class Projectile{
 
     void update_position(){
 
-        x_position += projectile_speed;
-        x_position_left = x_position - (width/2);
-        x_position_right = x_position + (width/2);
+        x_position_centre += projectile_speed;
+        x_position_left = x_position_centre - (width/2);
+        x_position_right = x_position_centre + (width/2);
 
-        if ((x_position > 256)|(x_position < 0)){
+        if ((x_position_centre > 256)|(x_position_centre < 0)){
             exist = false;
         } 
 
     }
 
-    int get_centre_x(){
-        return x_position;
+    int get_x_position_centre(){
+        return x_position_centre;
     }
 
     bool get_exist(){
@@ -273,8 +273,8 @@ class Weapon{
         int time_until_next_projectile = 0;
         bool reloading = false;
         int projectile_capacity;
-        int x_position;
-        int y_position;
+        int x_position_centre;
+        int y_position_centre;
         int current_projectile_amount;
         string weapon_type;
         char direction_facing;
@@ -283,7 +283,8 @@ class Weapon{
 
     public:
 
-        Weapon(int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position, string weapon_type){
+        Weapon(int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing,
+         int projectile_capacity, int x_position_centre, int y_position_centre, string weapon_type){
 
             this->projectile_speed = projectile_speed;
             this->damage = damage;
@@ -293,8 +294,8 @@ class Weapon{
             this->projectile_capacity = projectile_capacity;
             this->current_projectile_amount = projectile_capacity;
 
-            this->x_position = x_position;
-            this->y_position = y_position;
+            this->x_position_centre = x_position_centre;
+            this->y_position_centre = y_position_centre;
 
             this->weapon_type = weapon_type;
 
@@ -303,9 +304,9 @@ class Weapon{
 
         void move_weapon(int new_x, int new_y){
 
-            if (new_x != x_position){
+            if (new_x != x_position_centre){
 
-                if(new_x > x_position){
+                if(new_x > x_position_centre){
                     direction_facing = 'r';
                 }
                 
@@ -315,9 +316,9 @@ class Weapon{
             }
             
 
-            x_position = new_x;
+            x_position_centre = new_x;
             
-            y_position = new_y;
+            y_position_centre = new_y;
 
         }
 
@@ -338,7 +339,7 @@ class Weapon{
 
         Projectile* create_projectile(){
 
-            Projectile *new_projectile = new Projectile(projectile_speed,direction_facing, x_position,y_position,10,5,damage);
+            Projectile *new_projectile = new Projectile(projectile_speed,direction_facing, x_position_centre,y_position_centre,10,5,damage);
 
             return new_projectile;
 
@@ -455,8 +456,8 @@ class Cursor{
 
     private:
 
-    int centre_x;
-    int centre_y;
+    int x_position_centre;
+    int y_position_centre;
     int x_position_left;
     int x_position_right;
     int y_position_top;
@@ -468,23 +469,23 @@ class Cursor{
 
         Cursor(int x, int y){
 
-            this->centre_x = x;
-            this->centre_y = y;
+            this->x_position_centre = x;
+            this->y_position_centre = y;
 
-            this->x_position_left = centre_x-20;
-            this->x_position_right = centre_x+20;
+            this->x_position_left = x_position_centre-20;
+            this->x_position_right = x_position_centre+20;
 
             this->y_position_top = y - 5;
             this->y_position_bottom = y + 5;
             
         }
 
-        int get_centre_x(){
-            return centre_x;
+        int get_x_position_centre(){
+            return x_position_centre;
         }
 
         void set_all_x(int new_value){
-            centre_x = new_value;
+            x_position_centre = new_value;
             x_position_left = new_value-20;
             x_position_right = new_value+20;
         }
@@ -501,14 +502,14 @@ class Cursor{
 
         void movement(){
             //if cursor is on middle or right option, then can move left
-            if ((moving_left==true) & ((centre_x == 128)|(centre_x == 198))){
-                set_all_x(centre_x-70);
+            if ((moving_left==true) & ((x_position_centre == 128)|(x_position_centre == 198))){
+                set_all_x(x_position_centre-70);
                 moving_left = false;
             }
 
             //if cursor is on left or middle option, then can move right
-            if ((moving_right==true) & ((centre_x == 58)|(centre_x == 128))){
-                set_all_x(centre_x+70);
+            if ((moving_right==true) & ((x_position_centre == 58)|(x_position_centre == 128))){
+                set_all_x(x_position_centre+70);
                 moving_right = false;
             }
 
@@ -529,8 +530,8 @@ class Wall{
 
 private:
 
-    int centre_x;
-    int centre_y;
+    int x_position_centre;
+    int y_position_centre;
     int x_position_left;
     int x_position_right;
     int y_position_top;
@@ -541,12 +542,12 @@ public:
 
     Wall(int x, int y, int width, int height){
 
-        this->centre_x = x;
-        this->centre_y = y;
-        this->x_position_left = centre_x - (width/2);
-        this->x_position_right = centre_x + (width/2);
-        this->y_position_top = centre_y - (height/2);
-        this->y_position_bottom = centre_y + (height/2);
+        this->x_position_centre = x;
+        this->y_position_centre = y;
+        this->x_position_left = x_position_centre - (width/2);
+        this->x_position_right = x_position_centre + (width/2);
+        this->y_position_top = y_position_centre - (height/2);
+        this->y_position_bottom = y_position_centre + (height/2);
 
 
     }
@@ -600,8 +601,6 @@ class Enemy{
 
     private:
 
-        int centre_x;
-        int centre_y;
         int x_position_centre;
         int x_position_left;
         int x_position_right;
@@ -742,7 +741,7 @@ int menu(){
 
     }
 
-    int cursor_location = cursor.get_centre_x();
+    int cursor_location = cursor.get_x_position_centre();
 
     int choice;
 
@@ -880,7 +879,7 @@ void area1(){
             (*it)->update_position();//move projectile
 
             iprintf("\n");
-            iprintf("proj x %i",(*it)->get_centre_x());//print centre
+            iprintf("proj x %i",(*it)->get_x_position_centre());//print centre
 
             //if projectile is not on screen, erase from list
             if(((*it)->get_exist())==false){
