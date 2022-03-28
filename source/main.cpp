@@ -8,6 +8,8 @@
 
 #include <list>
 
+#include <cmath>
+
 using namespace std;
 
 //256x192 pixels
@@ -610,8 +612,12 @@ class Enemy{
         int width;
         int height;
         bool moving = false;
-        int GRAVITY = 5;
+        int GRAVITY = 7;
         int speed;
+        bool jumping = true;
+        bool falling = false;
+        int velocity;
+        int velocity_increment = 1;
 
 
 
@@ -632,6 +638,7 @@ class Enemy{
         this->y_position_bottom = y+(height/2);
 
         this->speed = speed;
+        this->velocity = GRAVITY;
 
 
     }
@@ -651,8 +658,31 @@ class Enemy{
 
     }
 
-    void movement_calculations(){
-        update_all_x(x_position_centre+speed);
+    void movement_calculations(int frame){
+        if (frame%2 == 0){
+            update_all_x(x_position_centre+speed);
+        }
+
+        if (jumping == true){
+            update_all_y(y_position_centre-velocity);
+             velocity -= velocity_increment;
+            //if jump hits peak then it is falling
+            if (velocity == 0){
+                jumping = false;
+                falling = true;
+            }
+        }
+
+        if (falling == true){
+            update_all_y(y_position_centre-velocity);
+            velocity -= velocity_increment;
+            if (velocity == -(GRAVITY)-1){
+                falling = false;
+                jumping = true;
+                velocity = GRAVITY;
+            }
+        }
+        
 
 
     }
@@ -897,9 +927,7 @@ void area1(){
         for(std::list<Enemy*>::iterator it = list_of_enemies.begin(); it != list_of_enemies.end();){
 
             (*it)->display_position();//show location
-            if ((frame%2)==0){
-                (*it)->movement_calculations();//move projectile
-            }
+            (*it)->movement_calculations(frame);//move projectile
             
 
             iprintf("\n");
