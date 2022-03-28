@@ -537,8 +537,6 @@ private:
     int y_position_bottom;
 
 
-
-
 public:
 
     Wall(int x, int y, int width, int height){
@@ -595,7 +593,87 @@ public:
 
 };
 
+//----------------------------------------enemy class----------------------------------------//
 
+class Enemy{
+
+
+    private:
+
+        int centre_x;
+        int centre_y;
+        int x_position_centre;
+        int x_position_left;
+        int x_position_right;
+        int y_position_top;
+        int y_position_bottom;
+        int y_position_centre;
+        int width;
+        int height;
+        bool moving = false;
+        int GRAVITY = 5;
+        int speed;
+
+
+
+    public:
+
+    Enemy(int x,int y, int width, int height, int speed){
+
+        this->width = width;
+        this->height = height;
+
+        this->x_position_centre = x;
+        this->x_position_left = x_position_centre - (width/2);
+        this->x_position_right = x_position_centre + (width/2);
+        
+
+        this->y_position_centre = y;
+        this->y_position_top = y-(height/2);
+        this->y_position_bottom = y+(height/2);
+
+        this->speed = speed;
+
+
+    }
+
+    void update_all_y(int new_y){
+        y_position_centre = new_y;
+        y_position_top = new_y-(height/2);
+        y_position_bottom = new_y+(height/2);
+
+    }
+
+    void update_all_x(int new_x){
+        x_position_centre = new_x;
+        x_position_left = x_position_centre - (width/2);
+        x_position_right = x_position_centre + (width/2);
+
+
+    }
+
+    void movement_calculations(){
+        update_all_x(x_position_centre+speed);
+
+
+    }
+
+    void display_position(){
+
+        glBegin2D();/*opens gl for 2d creation*/
+
+        glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(0, 0, 255));
+
+        glEnd2D();/*ends gl for 2d creation*/
+
+    }
+
+
+    int get_x_position_centre(){
+        return x_position_centre;
+    }
+
+};
 
 void Vblank() {
 	frame++;
@@ -708,7 +786,7 @@ void area1(){
 
     Platform platform2(226,160,30,10);
 
-    Platform platform3(128,100,30,10);
+    Platform platform3(128,130,30,10);
 
 
     char starting_direction = 'r';
@@ -728,11 +806,25 @@ void area1(){
     Wall right_wall(262,96,10,192);
 
 
+    //create test enemy and pointer to test enemy
+    Enemy test_enemy(5,187,10,10,1);
+
+    Enemy *pointerTestEnemy;
+
+    pointerTestEnemy = &test_enemy;
+
+
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    Weapon weapon(3,3,10,300,'r',12,starting_x,starting_y,"ranged");
+    Weapon weapon(10,3,10,300,'r',12,starting_x,starting_y,"ranged");
+
+    //create lists for pointers to projectiles and enemies
 
     std::list<Projectile*> list_of_projectiles;
+
+    std::list<Enemy*> list_of_enemies;
+
+    list_of_enemies.insert(list_of_enemies.begin(),pointerTestEnemy);
 
     bool running = true;
     
@@ -761,7 +853,6 @@ void area1(){
 
         iprintf("\n");
         iprintf("number of projectiles %i",list_of_projectiles.size());
-        
 
         scanKeys();
 
@@ -799,6 +890,23 @@ void area1(){
             else{//else increment iterator
                 ++it;
             }
+
+        }
+
+        //logic loop for existing enemies
+
+        for(std::list<Enemy*>::iterator it = list_of_enemies.begin(); it != list_of_enemies.end();){
+
+            (*it)->display_position();//show location
+            if ((frame%2)==0){
+                (*it)->movement_calculations();//move projectile
+            }
+            
+
+            iprintf("\n");
+            iprintf("enemy position %i",(*it)->get_x_position_centre());
+
+            ++it;
 
         }
 
@@ -935,6 +1043,8 @@ void area1(){
 
 
         glFlush(0);
+
+        Vblank();
 
         swiWaitForVBlank();//wait for next frame
 
