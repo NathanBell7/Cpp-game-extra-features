@@ -623,84 +623,85 @@ class Enemy{
 
     public:
 
-    Enemy(int x,int y, int width, int height, int speed){
+        Enemy(int x,int y, int width, int height, int speed){
 
-        this->width = width;
-        this->height = height;
+            this->width = width;
+            this->height = height;
 
-        this->x_position_centre = x;
-        this->x_position_left = x_position_centre - (width/2);
-        this->x_position_right = x_position_centre + (width/2);
-        
+            this->x_position_centre = x;
+            this->x_position_left = x_position_centre - (width/2);
+            this->x_position_right = x_position_centre + (width/2);
+            
 
-        this->y_position_centre = y;
-        this->y_position_top = y-(height/2);
-        this->y_position_bottom = y+(height/2);
+            this->y_position_centre = y;
+            this->y_position_top = y-(height/2);
+            this->y_position_bottom = y+(height/2);
 
-        this->speed = speed;
-        this->velocity = GRAVITY;
-
-
-    }
-
-    void update_all_y(int new_y){
-        y_position_centre = new_y;
-        y_position_top = new_y-(height/2);
-        y_position_bottom = new_y+(height/2);
-
-    }
-
-    void update_all_x(int new_x){
-        x_position_centre = new_x;
-        x_position_left = x_position_centre - (width/2);
-        x_position_right = x_position_centre + (width/2);
+            this->speed = speed;
+            this->velocity = GRAVITY;
 
 
-    }
-
-    void movement_calculations(int frame){
-        if (frame%2 == 0){
-            update_all_x(x_position_centre+speed);
         }
 
-        if (jumping == true){
-            update_all_y(y_position_centre-velocity);
-             velocity -= velocity_increment;
-            //if jump hits peak then it is falling
-            if (velocity == 0){
-                jumping = false;
-                falling = true;
+        void update_all_y(int new_y){
+            y_position_centre = new_y;
+            y_position_top = new_y-(height/2);
+            y_position_bottom = new_y+(height/2);
+
+        }
+
+        void update_all_x(int new_x){
+            x_position_centre = new_x;
+            x_position_left = x_position_centre - (width/2);
+            x_position_right = x_position_centre + (width/2);
+
+
+        }
+
+        void movement_calculations(int frame){
+            if (frame%2 == 0){
+                update_all_x(x_position_centre+speed);
+
+                if (jumping == true){
+                    update_all_y(y_position_centre-velocity);
+                    velocity -= velocity_increment;
+                    //if jump hits peak then it is falling
+                    if (velocity == 0){
+                        jumping = false;
+                        falling = true;
+                    }
+                }
+
+
+
+
+                if (falling == true){
+                    update_all_y(y_position_centre-velocity);
+                    velocity -= velocity_increment;
+                    if (velocity == -(GRAVITY)-1){
+                        falling = false;
+                        jumping = true;
+                        velocity = GRAVITY;
+                    }
+                }
             }
+            
         }
 
-        if (falling == true){
-            update_all_y(y_position_centre-velocity);
-            velocity -= velocity_increment;
-            if (velocity == -(GRAVITY)-1){
-                falling = false;
-                jumping = true;
-                velocity = GRAVITY;
-            }
+        void display_position(){
+
+            glBegin2D();/*opens gl for 2d creation*/
+
+            glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(0, 0, 255));
+
+            glEnd2D();/*ends gl for 2d creation*/
+
         }
-        
 
 
-    }
-
-    void display_position(){
-
-        glBegin2D();/*opens gl for 2d creation*/
-
-        glBoxFilled(x_position_left,y_position_top,x_position_right,y_position_bottom,RGB15(0, 0, 255));
-
-        glEnd2D();/*ends gl for 2d creation*/
-
-    }
-
-
-    int get_x_position_centre(){
-        return x_position_centre;
-    }
+        int get_x_position_centre(){
+            return x_position_centre;
+        }
 
 };
 
