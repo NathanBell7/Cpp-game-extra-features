@@ -277,6 +277,10 @@ class Projectile{
         return exist;
     }
 
+    void set_exist(bool new_value){
+        exist = new_value;
+    }
+
 
 };
 
@@ -725,7 +729,7 @@ class Enemy{
 
         int get_x_position_centre(){
         return x_position_centre;
-    }
+        }
 
         int get_x_position_left(){
             return x_position_left;
@@ -908,15 +912,6 @@ void area1(){
 
     Wall right_wall(262,96,10,192);
 
-
-    //create test enemy and pointer to test enemy
-    Enemy test_enemy(10,187,20,20,1);
-
-    Enemy *pointerTestEnemy;
-
-    pointerTestEnemy = &test_enemy;
-
-
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
     Weapon weapon(10,3,10,300,'r',12,starting_x,starting_y,"ranged");
@@ -926,8 +921,6 @@ void area1(){
     std::list<Projectile*> list_of_projectiles;
 
     std::list<Enemy*> list_of_enemies;
-
-    list_of_enemies.insert(list_of_enemies.begin(),pointerTestEnemy);
 
 
     int health_of_base = 10;
@@ -994,6 +987,7 @@ void area1(){
 
                 if (projectile_enemy_collision(*it,*enemy_iterator)){
                     enemy_iterator = list_of_enemies.erase(enemy_iterator);
+                    (*it)->set_exist(false);
                 }
 
                 else{
@@ -1171,6 +1165,17 @@ void area1(){
         if(right_wall.detect_collision_player(player)==true){
             player.set_all_x(right_wall.get_x_position_left()-17);
         }
+
+
+        if(frame%150 == 0){
+            Enemy *test_enemy = new Enemy(10,187,20,20,1);
+
+            list_of_enemies.insert(list_of_enemies.begin(),test_enemy);
+
+        }
+
+        iprintf("\n");
+        iprintf("%i",list_of_enemies.size());
 
 
         glFlush(0);
