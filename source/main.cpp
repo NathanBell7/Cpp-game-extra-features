@@ -252,6 +252,27 @@ class Projectile{
         return x_position_centre;
     }
 
+    int get_x_position_left(){
+        return x_position_left;
+    }
+
+    int get_x_position_right(){
+        return x_position_right;
+    }
+
+    int get_y_position_centre(){
+        return y_position_centre;
+    }
+
+    int get_y_position_top(){
+        return y_position_top;
+    }
+
+    int get_y_position_bottom(){
+        return y_position_bottom;
+    }
+
+
     bool get_exist(){
         return exist;
     }
@@ -703,7 +724,27 @@ class Enemy{
 
 
         int get_x_position_centre(){
-            return x_position_centre;
+        return x_position_centre;
+    }
+
+        int get_x_position_left(){
+            return x_position_left;
+        }
+
+        int get_x_position_right(){
+            return x_position_right;
+        }
+
+        int get_y_position_centre(){
+            return y_position_centre;
+        }
+
+        int get_y_position_top(){
+            return y_position_top;
+        }
+
+        int get_y_position_bottom(){
+            return y_position_bottom;
         }
 
         bool get_exist(){
@@ -804,6 +845,27 @@ int menu(){
 
 
 
+//----------------------------------------bullet enemy collision method----------------------------------------//
+
+
+
+bool projectile_enemy_collision(Projectile *projectile, Enemy *enemy){
+
+    if ((((projectile)->get_x_position_left()) < ((enemy)->get_x_position_right()))&
+    (((projectile)->get_x_position_left()) > ((enemy)->get_x_position_left()))&
+    ((((projectile)->get_y_position_bottom() < (enemy)->get_y_position_bottom())&
+    ((projectile)->get_y_position_bottom() >(enemy)->get_y_position_top()))|
+    (((projectile)->get_y_position_top() < (enemy)->get_y_position_bottom())&
+    ((projectile)->get_y_position_top() >(enemy)->get_y_position_top()))|
+    (((projectile)->get_y_position_centre() < (enemy)->get_y_position_bottom())&
+    ((projectile)->get_y_position_centre() >(enemy)->get_y_position_top())))){
+        return true;
+    }
+    return false;
+}
+
+
+
 //----------------------------------------area 1 method----------------------------------------//
 
 
@@ -830,7 +892,7 @@ void area1(){
     Platform platform3(128,130,30,10);
 
 
-    char starting_direction = 'r';
+    char starting_direction = 'l';
 
     int starting_x = 128;
 
@@ -848,7 +910,7 @@ void area1(){
 
 
     //create test enemy and pointer to test enemy
-    Enemy test_enemy(5,187,10,10,1);
+    Enemy test_enemy(10,187,20,20,1);
 
     Enemy *pointerTestEnemy;
 
@@ -928,6 +990,19 @@ void area1(){
             iprintf("\n");
             iprintf("proj x %i",(*it)->get_x_position_centre());//print centre
 
+            for(std::list<Enemy*>::iterator enemy_iterator = list_of_enemies.begin(); enemy_iterator != list_of_enemies.end();){
+
+                if (projectile_enemy_collision(*it,*enemy_iterator)){
+                    enemy_iterator = list_of_enemies.erase(enemy_iterator);
+                }
+
+                else{
+                    ++enemy_iterator;
+                }
+
+            }
+
+
             //if projectile is not on screen, erase from list
             if(((*it)->get_exist())==false){
                 it = list_of_projectiles.erase(it);
@@ -961,6 +1036,10 @@ void area1(){
             }
             
         }
+
+
+
+
 
         //checking what keys have been pressed
 
