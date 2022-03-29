@@ -618,6 +618,7 @@ class Enemy{
         bool falling = false;
         int velocity;
         int velocity_increment = 1;
+        bool exist = true;
 
 
 
@@ -658,9 +659,14 @@ class Enemy{
 
         }
 
-        void movement_calculations(int frame){
+        void movement_calculations(int frame, bool move_horizontally){
+
             if (frame%2 == 0){
-                update_all_x(x_position_centre+speed);
+                
+                if (move_horizontally == true){
+                    update_all_x(x_position_centre+speed);
+                }
+                
 
                 if (jumping == true){
                     update_all_y(y_position_centre-velocity);
@@ -671,9 +677,6 @@ class Enemy{
                         falling = true;
                     }
                 }
-
-
-
 
                 if (falling == true){
                     update_all_y(y_position_centre-velocity);
@@ -701,6 +704,14 @@ class Enemy{
 
         int get_x_position_centre(){
             return x_position_centre;
+        }
+
+        bool get_exist(){
+            return exist;
+        }
+
+        int get_width(){
+            return width;
         }
 
 };
@@ -856,6 +867,11 @@ void area1(){
 
     list_of_enemies.insert(list_of_enemies.begin(),pointerTestEnemy);
 
+
+    int health_of_base = 10;
+
+
+
     bool running = true;
     
 	while(running) {
@@ -928,14 +944,22 @@ void area1(){
         for(std::list<Enemy*>::iterator it = list_of_enemies.begin(); it != list_of_enemies.end();){
 
             (*it)->display_position();//show location
-            (*it)->movement_calculations(frame);//move projectile
+            if ((*it)->get_x_position_centre() != 256 -((*it)->get_width())/2){
+                (*it)->movement_calculations(frame,true);//move projectile horizontally and vertically
+            }
+
+            else{
+                (*it)->movement_calculations(frame,false);//move projectile only vertically
+            }
             
 
-            iprintf("\n");
-            iprintf("enemy position %i",(*it)->get_x_position_centre());
-
-            ++it;
-
+            if (((*it)->get_exist())==false){
+                it = list_of_enemies.erase(it);
+            }
+            else{
+                ++it;
+            }
+            
         }
 
         //checking what keys have been pressed
