@@ -277,6 +277,10 @@ class Projectile{
         return exist;
     }
 
+    int get_damage(){
+        return damage;
+    }
+
     void set_exist(bool new_value){
         exist = new_value;
     }
@@ -644,12 +648,14 @@ class Enemy{
         int velocity;
         int velocity_increment = 1;
         bool exist = true;
+        int health;
+        int damage;
 
 
 
     public:
 
-        Enemy(int x,int y, int width, int height, int speed){
+        Enemy(int x,int y, int width, int height, int speed, int damage, int health){
 
             this->width = width;
             this->height = height;
@@ -665,6 +671,9 @@ class Enemy{
 
             this->speed = speed;
             this->velocity = GRAVITY;
+
+            this->damage = damage;
+            this->health = health;
 
 
         }
@@ -757,6 +766,22 @@ class Enemy{
 
         int get_width(){
             return width;
+        }
+
+        int get_damage(){
+            return damage;
+        }
+
+        void set_health(int new_value){
+            health = new_value;
+        }
+
+        int get_health(){
+            return health;
+        }
+
+        void set_exist(bool new_value){
+            exist = new_value;
         }
 
 };
@@ -914,7 +939,7 @@ void area1(){
 
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    Weapon weapon(10,3,10,300,'r',12,starting_x,starting_y,"ranged");
+    Weapon weapon(10,10,10,300,'r',12,starting_x,starting_y,"ranged");
 
     //create lists for pointers to projectiles and enemies
 
@@ -923,9 +948,9 @@ void area1(){
     std::list<Enemy*> list_of_enemies;
 
 
-    int health_of_base = 10;
+    int health_of_base = 1000;
 
-
+    frame = 0;
 
     bool running = true;
     
@@ -954,6 +979,9 @@ void area1(){
 
         iprintf("\n");
         iprintf("number of projectiles %i",list_of_projectiles.size());
+
+        iprintf("\n");
+        iprintf("health of base %i",health_of_base);
 
         scanKeys();
 
@@ -986,13 +1014,18 @@ void area1(){
             for(std::list<Enemy*>::iterator enemy_iterator = list_of_enemies.begin(); enemy_iterator != list_of_enemies.end();){
 
                 if (projectile_enemy_collision(*it,*enemy_iterator)){
-                    enemy_iterator = list_of_enemies.erase(enemy_iterator);
+                    
                     (*it)->set_exist(false);
+
+                    (*enemy_iterator)->set_health((*enemy_iterator)->get_health()-(*it)->get_damage());
+
+                    if (((*enemy_iterator)->get_health()) <= 0){
+                        (*enemy_iterator)->set_exist(false);
+                    }
                 }
 
-                else{
-                    ++enemy_iterator;
-                }
+                ++enemy_iterator;
+
 
             }
 
@@ -1012,6 +1045,9 @@ void area1(){
 
         for(std::list<Enemy*>::iterator it = list_of_enemies.begin(); it != list_of_enemies.end();){
 
+            iprintf("\n");
+            iprintf("enemy health%i",(*it)->get_health());
+
             (*it)->display_position();//show location
             if ((*it)->get_x_position_centre() != 256 -((*it)->get_width())/2){
                 (*it)->movement_calculations(frame,true);//move projectile horizontally and vertically
@@ -1019,6 +1055,7 @@ void area1(){
 
             else{
                 (*it)->movement_calculations(frame,false);//move projectile only vertically
+                health_of_base -= (*it)->get_damage();
             }
             
 
@@ -1167,15 +1204,16 @@ void area1(){
         }
 
 
-        if(frame%150 == 0){
-            Enemy *test_enemy = new Enemy(10,187,20,20,1);
+        if(frame%300 == 0){
+            Enemy *test_enemy = new Enemy(10,187,20,20,1,1,30);
 
             list_of_enemies.insert(list_of_enemies.begin(),test_enemy);
 
         }
 
-        iprintf("\n");
-        iprintf("%i",list_of_enemies.size());
+        if (health_of_base == 0){
+            running = false;
+        }
 
 
         glFlush(0);
