@@ -61,9 +61,7 @@ class Player{
             return falling;
         }
 
-        void set_falling(bool new_value){
-            falling = new_value;
-        }
+        
 
         int get_y_position_top(){
             return y_position_top;
@@ -112,10 +110,39 @@ class Player{
 
         }
 
+        void set_falling(bool new_value){
+            falling = new_value;
+        }
+
         void set_all_x(int new_value){
             x_position_centre = new_value;
             x_position_left = new_value-16;
             x_position_right = new_value+16;
+        }
+
+         void update_jump_action(){
+            if ((falling == false) && (jumping == false)){
+                //onlu jump when not falling or jumping
+                jumping = true;
+                velocity = GRAVITY;
+
+            }
+        }
+
+        void update_move_right_action(bool new_value){
+
+            if(moving_left==false){
+                moving_right = new_value;
+                direction_facing = 'r';
+            }    
+        }
+
+        void update_move_left_action(bool new_value){
+
+            if(moving_right==false){
+                moving_left = new_value;
+                direction_facing = 'l';
+            }
         }
 
         void character_movement(){
@@ -142,36 +169,9 @@ class Player{
                 set_all_y(y_position_centre-velocity);
                 velocity -= velocity_increment;
             }
-
         }
 
-        void update_jump_action(){
-            if ((falling == false) && (jumping == false)){
-                //onlu jump when not falling or jumping
-                jumping = true;
-                velocity = GRAVITY;
-
-            }
-        }
-
-        void update_move_right_action(bool new_value){
-
-            if(moving_left==false){
-                moving_right = new_value;
-                direction_facing = 'r';
-            }    
-            
-            
-        }
-
-        void update_move_left_action(bool new_value){
-
-            if(moving_right==false){
-                moving_left = new_value;
-                direction_facing = 'l';
-            }
-            
-        }
+       
 
 };
 
@@ -272,6 +272,10 @@ class Projectile{
         return y_position_bottom;
     }
 
+    int get_projectile_speed(){
+        return projectile_speed;
+    }
+
 
     bool get_exist(){
         return exist;
@@ -332,6 +336,29 @@ class Weapon{
 
         }
 
+        int get_time_until_next_projectile(){
+            return time_until_next_projectile;
+        }
+
+        int get_time_until_reloaded(){
+            return time_until_reloaded;
+        }
+
+        int get_current_projectile_amount(){
+            return current_projectile_amount;
+        }
+
+        bool get_reloading(){
+            return reloading;
+        }
+
+        void update_time_until_reloaded(int new_time){
+            time_until_reloaded = new_time;
+        }
+
+        void update_time_until_next_projectile(int new_time){
+            time_until_next_projectile = new_time;
+        }
 
         void move_weapon(int new_x, int new_y){
 
@@ -353,6 +380,16 @@ class Weapon{
 
         }
 
+        void start_reload_timer(){
+            reloading = true;
+            time_until_reloaded = reload_time;
+        }
+
+        void reload_magazine(){
+            current_projectile_amount = projectile_capacity;
+            reloading = false;
+        }
+
         bool shoot_projectile(){
 
             bool shooting = false;
@@ -368,6 +405,7 @@ class Weapon{
 
         }
 
+
         Projectile* create_projectile(){
 
             Projectile *new_projectile = new Projectile(projectile_speed,direction_facing, x_position_centre,y_position_centre,10,5,damage);
@@ -375,40 +413,6 @@ class Weapon{
             return new_projectile;
 
 
-        }
-
-        int get_time_until_next_projectile(){
-            return time_until_next_projectile;
-        }
-
-        void update_time_until_next_projectile(int new_time){
-            time_until_next_projectile = new_time;
-        }
-
-        int get_time_until_reloaded(){
-            return time_until_reloaded;
-        }
-
-        void update_time_until_reloaded(int new_time){
-            time_until_reloaded = new_time;
-        }
-
-        int get_current_projectile_amount(){
-            return current_projectile_amount;
-        }
-
-        bool get_reloading(){
-            return reloading;
-        }
-
-        void start_reload_timer(){
-            reloading = true;
-            time_until_reloaded = reload_time;
-        }
-
-        void reload_magazine(){
-            current_projectile_amount = projectile_capacity;
-            reloading = false;
         }
 
 };
@@ -521,6 +525,14 @@ class Cursor{
             x_position_right = new_value+20;
         }
 
+        void update_move_left(bool new_value){
+            moving_left = new_value;
+        }
+
+        void update_move_right(bool new_value){
+            moving_right = new_value;
+        }
+
         void display_position(){
 
             glBegin2D();/*opens gl for 2d creation*/
@@ -546,13 +558,8 @@ class Cursor{
 
         }
 
-        void update_move_left(bool new_value){
-            moving_left = new_value;
-        }
-
-        void update_move_right(bool new_value){
-            moving_right = new_value;
-        }
+        
+        
 };
 
 //----------------------------------------wall class----------------------------------------//
@@ -784,6 +791,12 @@ class Enemy{
             exist = new_value;
         }
 
+        void set_all_x(int new_value){
+            x_position_centre = new_value;
+            x_position_left = new_value-16;
+            x_position_right = new_value+16;
+        }
+
 };
 
 void Vblank() {
@@ -1003,40 +1016,47 @@ void area1(){
 
         //update projectile objects via pointer
 
-        for(std::list<Projectile*>::iterator it = list_of_projectiles.begin(); it != list_of_projectiles.end();){
+        for(std::list<Projectile*>::iterator projectile_iterator = list_of_projectiles.begin(); projectile_iterator != list_of_projectiles.end();){
 
-            (*it)->display_projectile();//show location
-            (*it)->update_position();//move projectile
+            (*projectile_iterator)->display_projectile();//show location
+            (*projectile_iterator)->update_position();//move projectile
 
             iprintf("\n");
-            iprintf("proj x %i",(*it)->get_x_position_centre());//print centre
+            iprintf("proj x %i",(*projectile_iterator)->get_x_position_centre());//print centre
 
             for(std::list<Enemy*>::iterator enemy_iterator = list_of_enemies.begin(); enemy_iterator != list_of_enemies.end();){
 
-                if (projectile_enemy_collision(*it,*enemy_iterator)){
+                //if projectile collides with an enemy
+                if (projectile_enemy_collision(*projectile_iterator,*enemy_iterator)){
                     
-                    (*it)->set_exist(false);
+                    (*projectile_iterator)->set_exist(false);//projectile no longer exists
 
-                    (*enemy_iterator)->set_health((*enemy_iterator)->get_health()-(*it)->get_damage());
+                    (*enemy_iterator)->set_health((*enemy_iterator)->get_health()-(*projectile_iterator)->get_damage());//change health of enemy by damage of projectile
 
-                    if (((*enemy_iterator)->get_health()) <= 0){
+                    if((*projectile_iterator)->get_projectile_speed()<0){
+                        (*enemy_iterator)->set_all_x((*enemy_iterator)->get_x_position_centre()-10);
+                    }
+
+                    else if (((*projectile_iterator)->get_projectile_speed()>0)&((*enemy_iterator)->get_x_position_centre()!=256)){
+                        (*enemy_iterator)->set_all_x((*enemy_iterator)->get_x_position_centre()+10);
+                    }
+
+                    if (((*enemy_iterator)->get_health()) <= 0){//if enemy health is less than 0, then it should no longer exist
                         (*enemy_iterator)->set_exist(false);
                     }
                 }
 
                 ++enemy_iterator;
 
-
             }
 
-
             //if projectile is not on screen, erase from list
-            if(((*it)->get_exist())==false){
-                it = list_of_projectiles.erase(it);
+            if(((*projectile_iterator)->get_exist())==false){
+                projectile_iterator = list_of_projectiles.erase(projectile_iterator);
             }
 
             else{//else increment iterator
-                ++it;
+                ++projectile_iterator;
             }
 
         }
@@ -1049,6 +1069,7 @@ void area1(){
             iprintf("enemy health%i",(*it)->get_health());
 
             (*it)->display_position();//show location
+
             if ((*it)->get_x_position_centre() != 256 -((*it)->get_width())/2){
                 (*it)->movement_calculations(frame,true);//move projectile horizontally and vertically
             }
@@ -1057,7 +1078,6 @@ void area1(){
                 (*it)->movement_calculations(frame,false);//move projectile only vertically
                 health_of_base -= (*it)->get_damage();
             }
-            
 
             if (((*it)->get_exist())==false){
                 it = list_of_enemies.erase(it);
@@ -1067,10 +1087,6 @@ void area1(){
             }
             
         }
-
-
-
-
 
         //checking what keys have been pressed
 
