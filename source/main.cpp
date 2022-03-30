@@ -1037,7 +1037,7 @@ void area1(){
                         (*enemy_iterator)->set_all_x((*enemy_iterator)->get_x_position_centre()-10);
                     }
 
-                    else if (((*projectile_iterator)->get_projectile_speed()>0)&((*enemy_iterator)->get_x_position_centre()!=256)){
+                    else if (((*projectile_iterator)->get_projectile_speed()>0)&((*enemy_iterator)->get_x_position_centre()!=(256 - ((*enemy_iterator)->get_width())/2))){
                         (*enemy_iterator)->set_all_x((*enemy_iterator)->get_x_position_centre()+10);
                     }
 
@@ -1070,7 +1070,7 @@ void area1(){
 
             (*it)->display_position();//show location
 
-            if ((*it)->get_x_position_centre() != 256 -((*it)->get_width())/2){
+            if ((*it)->get_x_position_centre() != 256 - ((*it)->get_width())/2){
                 (*it)->movement_calculations(frame,true);//move projectile horizontally and vertically
             }
 
