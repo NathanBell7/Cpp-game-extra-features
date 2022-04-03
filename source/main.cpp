@@ -54,14 +54,11 @@ class Player{
 
             this->direction_facing = facing;
 
-
         }
 
         bool get_falling(){
             return falling;
         }
-
-        
 
         int get_y_position_top(){
             return y_position_top;
@@ -171,8 +168,6 @@ class Player{
             }
         }
 
-       
-
 };
 
 
@@ -232,7 +227,6 @@ class Projectile{
 
         glEnd2D();/*ends gl for 2d creation*/
 
-
     }
 
 
@@ -275,7 +269,6 @@ class Projectile{
     int get_projectile_speed(){
         return projectile_speed;
     }
-
 
     bool get_exist(){
         return exist;
@@ -352,6 +345,10 @@ class Weapon{
             return reloading;
         }
 
+        void set_damage(int new_value){
+            damage = new_value;
+        }
+
         void update_time_until_reloaded(int new_time){
             time_until_reloaded = new_time;
         }
@@ -373,7 +370,6 @@ class Weapon{
                 }
             }
             
-
             x_position_centre = new_x;
             
             y_position_centre = new_y;
@@ -557,8 +553,6 @@ class Cursor{
             }
 
         }
-
-        
         
 };
 
@@ -586,7 +580,6 @@ public:
         this->x_position_right = x_position_centre + (width/2);
         this->y_position_top = y_position_centre - (height/2);
         this->y_position_bottom = y_position_centre + (height/2);
-
 
     }
 
@@ -682,10 +675,10 @@ class Enemy{
             this->damage = damage;
             this->health = health;
 
-
         }
 
         void update_all_y(int new_y){
+
             y_position_centre = new_y;
             y_position_top = new_y-(height/2);
             y_position_bottom = new_y+(height/2);
@@ -693,10 +686,10 @@ class Enemy{
         }
 
         void update_all_x(int new_x){
+
             x_position_centre = new_x;
             x_position_left = x_position_centre - (width/2);
             x_position_right = x_position_centre + (width/2);
-
 
         }
 
@@ -744,7 +737,7 @@ class Enemy{
 
 
         int get_x_position_centre(){
-        return x_position_centre;
+            return x_position_centre;
         }
 
         int get_x_position_left(){
@@ -1125,6 +1118,16 @@ void area1(){
             running = false;
         }
 
+        if(keysDown() & KEY_R){
+            if (weapon.get_current_projectile_amount() != 12){
+                if (tracking_reload == false){
+                    weapon.start_reload_timer();
+                    tracking_reload = true;
+                }
+            }
+            
+        }
+
         weapon.move_weapon(player.get_centre_x(),player.get_centre_y());
         player.character_movement();
 
@@ -1227,7 +1230,7 @@ void area1(){
 
         }
 
-        if (health_of_base == 0){
+        if (health_of_base < 1){
             running = false;
         }
 
