@@ -945,7 +945,7 @@ void area1(){
 
     //int projectile_speed, int damage, int projectile_delay, int reload_time, int direction_facing, int projectile_capacity, int x_position, int y_position
 
-    Weapon weapon(10,10,10,300,'r',12,starting_x,starting_y,"ranged");
+    Weapon weapon(10,10,10,100,'r',12,starting_x,starting_y,"ranged");
 
     //create lists for pointers to projectiles and enemies
 
